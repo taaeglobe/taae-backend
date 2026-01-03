@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const upload = multer(); // memory storage
 
-const faqController = require("../controllers/FaqController");
+const faqController = require("../controllers/FaqController.js");
 
 router.get("/", faqController.getAllFaqs);
 router.post("/", upload.none(), faqController.createFaq);

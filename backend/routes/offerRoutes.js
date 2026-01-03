@@ -9,7 +9,7 @@ const {
   createOffer,
   updateOffer,
   deleteOffer,
-} = require("../controllers/OfferController");
+} = require("../controllers/OfferController.js");
 
 // Multer config
 const storage = multer.diskStorage({

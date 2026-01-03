@@ -1,7 +1,5 @@
-node_modules/
-.cache/
-.next/
-dist/
-build/
-.env/
+node_modules
 .env
+dist
+build
+.cache

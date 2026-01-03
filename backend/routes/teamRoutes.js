@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
-const teamController = require("../controllers/TeamController");
+const teamController = require("../controllers/TeamController.js");
 
 // Storage config
 const storage = multer.diskStorage({

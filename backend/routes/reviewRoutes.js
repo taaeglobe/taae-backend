@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const reviewController = require("../controllers/reviewsController");
+const reviewController = require("../controllers/reviewsController.js");
 const multer = require("multer");
 const upload = multer(); // memory storage
 router.get("/", reviewController.getReviews);

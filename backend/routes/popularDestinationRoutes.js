@@ -9,7 +9,7 @@ const {
   createDestination,
   updateDestination,
   deleteDestination,
-} = require("../controllers/popularDestinationController");
+} = require("../controllers/popularDestinationController.js");
 
 // Configure multer for image upload
 const storage = multer.diskStorage({
