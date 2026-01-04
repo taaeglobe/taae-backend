@@ -1,5 +1,8 @@
 const pool = require("../../db");
 
+// Helper: normalize line breaks
+const normalizeText = (text) => (text ? text.replace(/\r\n/g, "\n") : "");
+
 // Get all destinations
 exports.getDestinations = async (req, res) => {
   try {
@@ -11,10 +14,10 @@ exports.getDestinations = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-// get a single destination
+
+// Get a single destination
 exports.getSingleDestination = async (req, res) => {
   const { id } = req.params;
-
   try {
     const result = await pool.query(
       "SELECT * FROM popular_destinations WHERE id = $1",
@@ -61,10 +64,13 @@ exports.createDestination = async (req, res) => {
   const image = req.file ? req.file.filename : null;
 
   try {
+    const cleanDescription = normalizeText(description);
+
     const result = await pool.query(
       "INSERT INTO popular_destinations (place_name, description, type, image) VALUES ($1, $2, $3, $4) RETURNING *",
-      [place_name, description, type, image]
+      [place_name, cleanDescription, type, image]
     );
+
     res.status(201).json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -77,17 +83,19 @@ exports.updateDestination = async (req, res) => {
   const { place_name, description, type } = req.body;
 
   try {
+    const cleanDescription = normalizeText(description);
+
     let query = "";
     let values = [];
 
     if (req.file) {
       query =
         "UPDATE popular_destinations SET place_name = $1, description = $2, type = $3, image = $4 WHERE id = $5 RETURNING *";
-      values = [place_name, description, type, req.file.filename, id];
+      values = [place_name, cleanDescription, type, req.file.filename, id];
     } else {
       query =
         "UPDATE popular_destinations SET place_name = $1, description = $2, type = $3 WHERE id = $4 RETURNING *";
-      values = [place_name, description, type, id];
+      values = [place_name, cleanDescription, type, id];
     }
 
     const result = await pool.query(query, values);
