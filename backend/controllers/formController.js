@@ -13,14 +13,11 @@ exports.getForms = async (req, res) => {
   }
 };
 
-
-
-
 exports.createForm = async (req, res) => {
   try {
     const { name, email, phoneNumber, message } = req.body;
 
-    // Save to database
+    // 1️⃣ Save to DB
     const result = await pool.query(
       `INSERT INTO forms (name, email, phone_number, message)
        VALUES ($1, $2, $3, $4)
@@ -28,10 +25,10 @@ exports.createForm = async (req, res) => {
       [name, email, phoneNumber, message]
     );
 
-    // 📧 Email to Admin
+    // 2️⃣ Email to Admin
     await transporter.sendMail({
-      from: `"Website Contact" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_TO,
+      from: `"TAE Globe Contact" <${process.env.SMTP_USER}>`, // VERIFIED EMAIL
+      to: process.env.SMTP_USER,
       subject: "📩 New Contact Form Submission",
       html: `
         <h3>New Contact Message</h3>
@@ -42,28 +39,32 @@ exports.createForm = async (req, res) => {
       `,
     });
 
-    // 📧 Auto Reply to User (Optional but Recommended)
-    await transporter.sendMail({
-      from: `"Support Team" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Thanks for contacting us!",
-      html: `
-        <p>Hello ${name},</p>
-        <p>Thank you for reaching out to us. We have received your message and will contact you shortly.</p>
-        <p><strong>Your Message:</strong><br/>${message}</p>
-        <br/>
-        <p>Best regards,<br/>Support Team</p>
-      `,
-    });
+    // 3️⃣ Auto Reply (safe)
+    try {
+      await transporter.sendMail({
+        from: `"TAE Globe Support" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: "Thanks for contacting TAE Globe",
+        html: `
+          <p>Hello ${name},</p>
+          <p>Thank you for contacting <strong>TAE Globe</strong>.</p>
+          <p>We’ve received your message and will get back to you shortly.</p>
+          <br/>
+          <p>Best regards,<br/>TAE Globe Team</p>
+        `,
+      });
+    } catch (mailErr) {
+      console.error("Auto-reply failed:", mailErr.message);
+    }
 
     res.status(201).json({
       success: true,
-      message: "Form submitted and email sent",
+      message: "Form submitted successfully",
       data: result.rows[0],
     });
+
   } catch (err) {
-    console.error(err);
+    console.error("FORM ERROR:", err);
     res.status(500).json({ error: "Failed to submit form" });
   }
 };
-
